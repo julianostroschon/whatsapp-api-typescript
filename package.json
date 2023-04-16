@@ -6,6 +6,11 @@
   "repository": "git@github.com:julianostroschon/whatsapp-api-typescript.git",
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "yarn build && node dist/src",
+    "test": "echo \"Error: no tests specified\" && exit 1"
+  },
   "devDependencies": {
     "@types/module-alias": "^2.0.1",
     "@types/node": "^18.15.11",
