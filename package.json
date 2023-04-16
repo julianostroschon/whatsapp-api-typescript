@@ -5,5 +5,9 @@
   "main": "index.js",
   "repository": "git@github.com:julianostroschon/whatsapp-api-typescript.git",
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "typescript": "^5.0.4"
+  }
 }
