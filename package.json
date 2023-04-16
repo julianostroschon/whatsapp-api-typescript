@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "yarn build && node dist/src",
+    "start:dev": "ts-node-dev src",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
     "test": "echo \"Error: no tests specified\" && exit 1"
@@ -19,6 +20,7 @@
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "eslint": "^8.38.0",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
