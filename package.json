@@ -9,6 +9,8 @@
   "scripts": {
     "build": "tsc",
     "start": "yarn build && node dist/src",
+    "lint": "eslint ./src ./test --ext .ts",
+    "lint:fix": "eslint ./src ./test --ext .ts --fix",
     "test": "echo \"Error: no tests specified\" && exit 1"
   },
   "devDependencies": {
