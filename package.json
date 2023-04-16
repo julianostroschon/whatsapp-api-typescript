@@ -7,7 +7,11 @@
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/module-alias": "^2.0.1",
     "@types/node": "^18.15.11",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "module-alias": "^2.2.2"
   }
 }
