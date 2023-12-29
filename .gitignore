@@ -62,3 +62,6 @@ typings/
 
 # typescript compiled code
 dist/
+
+# whatsapp-client data
+.wwebjs*
