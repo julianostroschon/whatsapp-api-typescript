@@ -1,13 +1,6 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import { generate } from 'qrcode-terminal';
 
-function parseNumber(number: string | number | undefined) {
-  if (!number) {
-    return '+55559692904@c.us';
-  }
-  return `${number}`.replace('+', '') + '@c.us';
-}
-
 export async function buildClient(clientId: string) {
   const client = new Client({
     authStrategy: new LocalAuth({
@@ -30,9 +23,9 @@ export async function buildClient(clientId: string) {
 
   await client.initialize();
   return {
-    sendMessage: async (phone: string | number, message: string) => {
+    sendMessage: async (phone: string | number = '+555596929042@c.us', message: string) => {
       try {
-        const receiver = parseNumber(phone);
+        const receiver = String(phone);
         const messageToSend = message;
        
         const { ack } = await client.sendMessage(receiver, messageToSend);

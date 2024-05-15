@@ -1,10 +1,21 @@
-import { buildServer } from "./server";
+import fastify from 'fastify';
+import { constructRoutes } from './http';
+import { env } from './infra/config';
 
-// console.log('index')
-const PORT = process.env.PORT || 3001;
+const port = Number(env.PORT) || 3001;
+const host = env.HOST || `0.0.0.0`;
 
-(async () => {
-  const server = await buildServer();
+const app = fastify({
+  ignoreDuplicateSlashes: true,
+  ignoreTrailingSlash: true,
+  logger: true,
+});
 
-  server.listen(PORT);
-})();
+constructRoutes(app);
+
+app.listen({ host, port }, function (err: Error | null): void {
+  if (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+});
