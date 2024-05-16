@@ -1,9 +1,9 @@
 import fastify from 'fastify';
 import { env } from './infra/config';
-import { WhatsAppClient } from './services/whatsapp/WhatsAppClient';
+import { WhatsAppClient } from './services/whatsapp';
 
-const port = Number(env.PORT) || 3001;
-const host = env.HOST || `0.0.0.0`;
+const port = env.PORT;
+const host = env.HOST;
 
 (async (): Promise<void> => {
   const client = new WhatsAppClient('clientId')
