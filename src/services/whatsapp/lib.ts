@@ -27,8 +27,8 @@ export function getClientOptions(clientId: string): ClientOptions {
 }
 
 export function getChatIdByName(chats: Chat[], chatName: string): string {
-  for (const { name, id, isGroup } of chats) {
-    if (name === chatName && isGroup) {
+  for (const { name, id } of chats) {
+    if (name === chatName) {
       const { server, user } = id
       return `${user}@${server}`
     }
