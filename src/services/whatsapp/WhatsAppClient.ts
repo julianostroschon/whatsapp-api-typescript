@@ -18,16 +18,35 @@ export class WhatsAppClient {
   private subscribeEvents(): void {
     this.client
       .on('qr', WhatsAppClient.generateQrCode)
-      .on('ready', (): void => console.log('Client is ready | All set!'))
-      .on('message', WhatsAppClient.onMessage);
+      .on('ready', () => {
+        // const content = `🤖 Bot WhatsApp Online! ✅\nCliente:*${clientId}*`
+      })
+      .on('message', this.onMessage);
   }
 
   private static generateQrCode(input: string): void {
     QRCode.generate(input, { small: true });
   }
 
-  private static async onMessage(message: Message): Promise<void> {
-    console.log(`Message received from ${message.author}: `, { message: message.body });
+  private async onMessage(msg: Message): Promise<void> {
+    const message = msg.body
+    const [marker] = message;
+    // const [marker] = message
+
+    if (message === 'ping') {
+      await msg.reply('pong');
+      return;
+    }
+    
+    if (marker === '#') {
+      const chatName = message.slice(1);
+      console.log({ message, marker, chatName });
+      const chatId = this.getChatIdByName(chatName)?._serialized
+      await msg.reply(chatId ?? 'Invalid chat name');
+      return;
+    }
+
+    console.log(`Message received from ${msg.author}: `, { msg: msg.body });
   }
 
   public async sendMessage(content: string, chatId = '5555969290424@c.us'): Promise<void> {

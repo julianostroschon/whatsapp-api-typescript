@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "yarn build && node dist/src",
-    "dev": "ts-node-dev src",
+    "dev": "nodemon -r ./src/index.ts",
     "test": "echo \"Error: no tests specified\" && exit 1",
     "test:functional": "jest --projects ./test --runInBand",
     "lint": "eslint ./src ./test --ext .ts",
