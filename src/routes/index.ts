@@ -31,7 +31,7 @@ export async function constructRoutes(app: FastifyInstance): Promise<void> {
     const chatName = decodeChatId(str)
     const chatId = client.getChatIdByName(chatName)
 
-    reply.send(chatId?._serialized);
+    reply.send(chatId);
   })
 
   app.post(`${preffix}encrypt`, async (req, reply) => {
