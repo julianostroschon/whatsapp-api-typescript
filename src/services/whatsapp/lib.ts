@@ -6,7 +6,16 @@ export function getClientOptions(clientId: string): ClientOptions {
       clientId,
     }),
     puppeteer: {
-      args: ['--no-sandbox']
+      args: [
+        '--disable-accelerated-2d-canvas',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--single-process',
+        '--no-first-run',
+        '--disable-gpu',
+        '--no-zygote',
+        '--no-sanbox',
+      ]
     },
     webVersionCache: {
       remotePath: "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html",
