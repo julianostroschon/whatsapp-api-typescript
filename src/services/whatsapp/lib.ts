@@ -1,4 +1,6 @@
-import { Chat, ChatId, ClientOptions, LocalAuth } from "whatsapp-web.js";
+import { Chat, ClientOptions, LocalAuth } from "whatsapp-web.js";
+
+export const errorMarkers = ['❌', '⚠️']
 
 export function getClientOptions(clientId: string): ClientOptions {
   return {
@@ -24,10 +26,11 @@ export function getClientOptions(clientId: string): ClientOptions {
   }
 }
 
-export function getChatIdByName(chats: Chat[], chatName: string): ChatId {
+export function getChatIdByName(chats: Chat[], chatName: string): string {
   for (const { name, id, isGroup } of chats) {
     if (name === chatName && isGroup) {
-      return id
+      const { server, user } = id
+      return `${user}@${server}`
     }
     continue
   }
