@@ -2,8 +2,10 @@ import fastify from 'fastify';
 import { env } from './infra/config';
 import { constructRoutes } from './routes';
 
-const port = env.PORT;
-const host = env.HOST;
+const opts = {
+  port: env.PORT,
+  host: env.HOST
+};
 
 (async (): Promise<void> => {
   const app = fastify({
@@ -11,7 +13,7 @@ const host = env.HOST;
   });
   await constructRoutes(app);
 
-  app.listen({ host, port }, function (err: Error | null): void {
+  app.listen(opts, function (err: Error | null): void {
     if (err) {
       app.log.error(err);
       process.exit(1);

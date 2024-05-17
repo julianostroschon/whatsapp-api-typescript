@@ -1,8 +1,7 @@
 {
   "name": "whatsapp-api-typescript",
   "version": "1.0.0",
-  "description": "Client to send messages to WahtsApp using typescript",
-  "main": "index.js",
+  "description": "Client to send messages to WhatsApp using typescript",
   "repository": "git@github.com:julianostroschon/whatsapp-api-typescript.git",
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",

@@ -1,31 +1,35 @@
 import { Chat, Client,Message } from 'whatsapp-web.js';
 import QRCode from 'qrcode-terminal';
 
-import { getChatIdByName, getClientOptions, errorMarkers } from './lib';
+import {
+  getClientOptions,
+  getChatIdByName,
+  errorMarkers,
+  readMessage
+} from './lib';
 import { env } from '../../infra/config';
-
-
 
 export class WhatsAppClient {
   private chats: Chat[] = [];
   private defaultChat = '';
   private groupToSendErrors = '';
+
   public constructor(private clientId: string) {
     this.client = new Client(getClientOptions(this.clientId));
   }
 
   public async initializeClient(): Promise<void> {
-    this.subscribeEvents();
-    await this.client.initialize();
+    void this.subscribeEvents();
+    void await this.client.initialize();
 
-    await this.constructDefaults()
+    void await this.constructDefaults();
   }
 
   private subscribeEvents(): void {
-    this.client
+    void this.client
       .on('qr', WhatsAppClient.generateQrCode)
-      .on('ready', () => {
-        // const content = `🤖 Bot WhatsApp Online! ✅\nCliente:*${clientId}*`
+      .on('ready', (): void => {
+        console.log(`🤖 Bot WhatsApp Online! ✅\nCliente: ${this.clientId}`);
       })
       .on('message', this.onMessage);
   }
@@ -35,40 +39,29 @@ export class WhatsAppClient {
     this.defaultChat = this.getChatIdByName();
     this.groupToSendErrors = this.getChatIdByName(env.GROUP_TO_SEND_ERROR);
 
-    this.sendMessage('🤖 Bot WhatsApp Online! ✅');
+    void this.sendMessage('🤖 Bot WhatsApp Online! ✅');
   }
 
   private static generateQrCode(input: string): void {
-    QRCode.generate(input, { small: true });
+    void QRCode.generate(input, { small: true });
   }
 
-  private async onMessage(msg: Message): Promise<void> {
-    const message = msg.body
-    const [marker] = message;
-
-    if (message === 'ping') {
-      await msg.reply('pong');
+  private async onMessage({ body, reply }: Message): Promise<void> {
+      if (body === 'ping') {
+      void await reply('pong');
       return;
     }
-    
-    if (marker === '#') {
-      const chatName = message.slice(1);
-      const chatId = this.getChatIdByName(chatName)
-      await msg.reply(chatId ?? 'Invalid chat name');
-    }
+
+    void await readMessage({ body, reply }, this.chats);
   }
 
   public async sendMessage(content: string, chatId: string = this.defaultChat): Promise<Message> {
-    const [marker] = content;
+    const [marker]: string = content;
     if (errorMarkers.includes(marker)) {
-      await this.sendMessage(content, this.groupToSendErrors)
+      void await this.sendMessage(content, this.groupToSendErrors);
     }
 
-    return await this.client.sendMessage(chatId, content)
-  }
-
-  public getChats(): Chat[] {
-    return this.chats;
+    return await this.client.sendMessage(chatId, content);
   }
 
   public getChatIdByName(chatName: string = env.DEFAULT_RECEIVER): string {

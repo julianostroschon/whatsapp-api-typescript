@@ -1,4 +1,4 @@
-import { Chat, ClientOptions, LocalAuth } from "whatsapp-web.js";
+import { Chat, ClientOptions, LocalAuth, Message } from "whatsapp-web.js";
 
 export const errorMarkers = ['❌', '⚠️']
 
@@ -26,13 +26,27 @@ export function getClientOptions(clientId: string): ClientOptions {
   }
 }
 
-export function getChatIdByName(chats: Chat[], chatName: string): string {
-  for (const { name, id } of chats) {
+export function getChatIdByName(chats: Chat[], chatName: string): string | undefined {
+  for (const { name, id: { server, user } } of chats) {
     if (name === chatName) {
-      const { server, user } = id
-      return `${user}@${server}`
+      return `${user}@${server}`;
     }
-    continue
   }
-  throw new Error('Chat not found')
+  console.warn('Chat not found');
+  return;
+}
+
+const READER = {
+  id: async (chats: Chat[], chatName: string, reply: Message['reply']): Promise<void> => {
+    const chatId = getChatIdByName(chats, chatName);
+    void await reply(chatId ?? 'Invalid chat name');
+  }
+}
+
+export async function readMessage({ body, reply }: Pick<Message, 'body' | 'reply'>, chats: Chat[]): Promise<void> {
+  const [marker, chatName]: string[] = body.split('#');
+
+  if (Object.keys(READER).includes(marker)) {
+    READER[marker as keyof typeof READER](chats, chatName, reply);
+  }
 }
