@@ -1,0 +1,17 @@
+networks:
+  api-network:
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    entrypoint: sh -c 'yarn install --frozen-lockfile && yarn start'
+    networks:
+      - api-network
+    ports:
+      - 3000:3000
+    volumes: 
+      - .:/app
+      - /app/node_modules
