@@ -6,7 +6,7 @@
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": "20.0.0"
+    "node": "20.5.0"
   },
   "scripts": {
     "build": "tsc",
@@ -33,6 +33,7 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
     "jsonwebtoken": "^9.0.2",
+    "puppeteer": "13.7.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.22.1"
   }
