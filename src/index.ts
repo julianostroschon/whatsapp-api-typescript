@@ -11,7 +11,9 @@ const opts = {
   const app = fastify({
     logger: true,
   });
-  await constructRoutes(app);
+  const [,clientId] = process.argv.join(' ').split('--client ');
+  
+  await constructRoutes(app, clientId);
 
   app.listen(opts, function (err: Error | null): void {
     if (err) {

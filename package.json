@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "yarn build && node dist/src",
+    "start": "node dist/",
     "format": "prettier -w .",
     "dev": "nodemon -r ./src/index.ts",
     "test": "echo \"Error: no tests specified\" && exit 1",

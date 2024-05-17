@@ -1,7 +1,7 @@
-const version = require('../package.json').version;
+const { version, name } = require('../package.json');
 const [API_VERSION] = version
 
-
 const URL_PREFIX = `/api/v${API_VERSION}/`;
+const PROJECT_NAME = name
 
-export { version, URL_PREFIX }
+export { URL_PREFIX, PROJECT_NAME }

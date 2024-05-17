@@ -3,11 +3,11 @@ import { FastifyInstance } from "fastify";
 import { WhatsAppClient } from "../services/";
 
 import { constructToken, decodeChatId, decodeCredentials } from "../domains/";
-import { URL_PREFIX } from "../constants";
+import { PROJECT_NAME, URL_PREFIX } from "../constants";
 
-export async function constructRoutes(app: FastifyInstance): Promise<void> {
+export async function constructRoutes(app: FastifyInstance, clientId: string = PROJECT_NAME): Promise<void> {
 
-  const client = new WhatsAppClient('clientId')
+  const client = new WhatsAppClient(clientId)
   await client.initializeClient()
 
   const parentLogger = app.log
