@@ -8,6 +8,7 @@ export function getClientOptions(clientId: string): ClientOptions {
       clientId,
     }),
     puppeteer: {
+      headless: true,
       args: [
         '--disable-accelerated-2d-canvas',
         '--disable-setuid-sandbox',
