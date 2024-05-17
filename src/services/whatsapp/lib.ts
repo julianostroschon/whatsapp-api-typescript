@@ -13,6 +13,7 @@ export function getClientOptions(clientId: string): ClientOptions {
         '--disable-accelerated-2d-canvas',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
+        '--no-sandbox argument',
         '--single-process',
         '--no-first-run',
         '--disable-gpu',
