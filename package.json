@@ -5,6 +5,9 @@
   "repository": "git@github.com:julianostroschon/whatsapp-api-typescript.git",
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": "20.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/",
