@@ -1,4 +1,4 @@
-const { version, name } = require('../package.json');
+import { version, name } from '../package.json';
 const [API_VERSION] = version
 
 const URL_PREFIX = `/api/v${API_VERSION}/`;
