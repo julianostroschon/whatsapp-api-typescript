@@ -12,7 +12,7 @@ COPY . .
 
 RUN yarn build
 
-FROM node:18-slim
+FROM node:18-slim as app
 
 # Install Google Chrome Stable and fonts
 # Note: this installs the necessary libs to make the browser work with Puppeteer.
