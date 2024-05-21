@@ -6,7 +6,7 @@
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": "20.5.0"
+    "node": "18.20.2"
   },
   "scripts": {
     "build": "tsc",
