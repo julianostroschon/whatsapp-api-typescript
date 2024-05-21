@@ -5,11 +5,8 @@
   "repository": "git@github.com:julianostroschon/whatsapp-api-typescript.git",
   "author": "Juliano Stroschon <julianostroschon@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": "18.20.2"
-  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "start": "node dist/",
     "format": "prettier -w .",
     "dev": "nodemon -r ./src/index.ts",
@@ -18,6 +15,7 @@
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.12.12",
     "@types/qrcode-terminal": "^0.12.0",
