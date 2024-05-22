@@ -35,7 +35,7 @@ COPY . .
 
 RUN yarn install --json --immutable
 
-COPY --from=builder /app/dist .
+COPY --from=builder /home/node/dist .
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 

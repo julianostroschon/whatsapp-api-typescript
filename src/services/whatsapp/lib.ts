@@ -17,7 +17,7 @@ export function getClientOptions(clientId: string): ClientOptions {
         '--no-first-run',
         '--disable-gpu',
         '--no-zygote',
-        '--no-sanbox',
+        '--no-sandbox',
       ]
     },
     webVersionCache: {
