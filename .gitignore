@@ -65,3 +65,5 @@ dist/
 
 # whatsapp-client data
 .wwebjs*
+
+.docker/
