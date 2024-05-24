@@ -1,5 +1,5 @@
 services:
-  api:
+  docker :
     image: julianostroschon/whatsapp-api-typescript-api:v5
     container_name: api-whats
     environment:
@@ -10,4 +10,4 @@ services:
     ports:
       - '${PORT:-3005}:3005'
     volumes:
-      - ./.docker/:/home/node
+      - ./.docker/.wwebjs_auth:/home/node/.wwebjs_auth
