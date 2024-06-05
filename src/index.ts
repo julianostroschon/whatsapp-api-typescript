@@ -1,9 +1,7 @@
-import { buildFastify } from './services/server';
-
+import { buildFastify } from "./services/server";
 
 (async (): Promise<void> => {
-  const [,clientId] = process.argv.join(' ').split('--client ');
-  
-  await buildFastify(clientId);
+  const [, clientId] = process.argv.join(" ").split("--client ");
 
+  await buildFastify(clientId);
 })();

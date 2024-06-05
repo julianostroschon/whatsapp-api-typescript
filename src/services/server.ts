@@ -1,11 +1,11 @@
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance } from "fastify";
 
-import { constructRoutes } from '../routes'
-import { env } from '../infra/config';
+import { constructRoutes } from "../routes";
+import { env } from "../infra/config";
 
 const opts = {
   port: env.PORT,
-  host: env.HOST
+  host: env.HOST,
 };
 
 export async function buildFastify(clientId: string): Promise<FastifyInstance> {
@@ -21,5 +21,5 @@ export async function buildFastify(clientId: string): Promise<FastifyInstance> {
       process.exit(1);
     }
   });
-  return app
+  return app;
 }
