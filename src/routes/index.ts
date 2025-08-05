@@ -1,46 +1,58 @@
 import { FastifyInstance } from "fastify";
 
-import { WhatsAppClient } from "../services/";
 
-import { constructToken, decodeChatId, decodeCredentials } from "../domains/";
-import { PROJECT_NAME, URL_PREFIX } from "../constants";
+import { Client } from "whatsapp-web.js";
+import { URL_PREFIX } from "../constants";
+import { constructToken } from "../domains/";
 
 export async function constructRoutes(
   app: FastifyInstance,
-  clientId: string = PROJECT_NAME,
+  client: Client,
 ): Promise<void> {
-  const client = new WhatsAppClient(clientId);
-  await client.initializeClient();
 
   const parentLogger = app.log;
 
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
     const logger = parentLogger.child({ method: "send" });
 
-    const token = (req.body as unknown as { token: string }).token;
-    logger.info({ token });
+    const body = (req.body as unknown as { token: string });
+    // logger.info({ token });
 
-    const { message, chatId } = decodeCredentials(token);
-    await client.sendMessage(message, chatId);
+    // const { message, chatId } = decodeCredentials);
+    const { phonenumber, message } = body
+    const chat = await client.getNumberId(phonenumber)
+    if (chat?._serialized) {
+      await client.sendMessage(chat._serialized, message);
+      logger.info(`message sent: ${message}`);
 
-    logger.info(`message sent: ${message}`);
+      reply.send({
+        status: "success",
+        message: "Message sent successfully"
+      });
+      return
+    }
 
-    reply.send(message);
+    reply.send({
+      status: "error",
+      message: "Failed to send message",
+      err: chat
+    });
+
   });
 
-  app.post(`${URL_PREFIX}chatId`, async (req, reply) => {
-    const logger = parentLogger.child({ method: "chatId" });
+  // app.post(`${URL_PREFIX}chatId`, async (req, reply) => {
+  //   const logger = parentLogger.child({ method: "chatId" });
 
-    const group = (req.body as unknown as { group: string }).group;
-    logger.info({ group });
+  //   const group = (req.body as unknown as { group: string }).group;
+  //   logger.info({ group });
 
-    const chatName = decodeChatId(group);
-    logger.info({ chatName });
-    const chatId = client.getChatIdByName(chatName);
-    logger.info(`chatId: ${chatId}`);
+  //   const chatName = decodeChatId(group);
+  //   logger.info({ chatName });
+  //   const chatId = client.getChatIdByName(chatName);
+  //   logger.info(`chatId: ${chatId}`);
 
-    reply.send({ chatId });
-  });
+  //   reply.send({ chatId });
+  // });
 
   app.post(`${URL_PREFIX}encrypt`, async (req, reply) => {
     const { phonenumber, message } = req.body as unknown as {

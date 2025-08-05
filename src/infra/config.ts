@@ -2,6 +2,7 @@ import { config } from "dotenv";
 config();
 
 export const env = Object.freeze({
+  BLOCKED_ROUTES: (process.env.BLOCKED_ROUTES || 'login,signup').split(','),
   GROUP_TO_SEND_ERROR: process.env.GROUP_TO_SEND_ERROR || "jojo",
   DEFAULT_RECEIVER: process.env.DEFAULT_RECEIVER || "groupName",
   TECH_LEAD: process.env.TECH_LEAD || "5599992200@c.us",

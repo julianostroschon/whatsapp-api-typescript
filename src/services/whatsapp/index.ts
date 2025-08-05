@@ -1,75 +1,37 @@
-import { Chat, Client, Message } from "whatsapp-web.js";
-import QRCode from "qrcode-terminal";
+import qrcode from "qrcode-terminal";
+import { Client } from "whatsapp-web.js";
+import { getClientOptions } from "./lib";
 
-import {
-  getClientOptions,
-  getChatIdByName,
-  errorMarkers,
-  readMessage,
-} from "./lib";
-import { env } from "../../infra/config";
+// Exported client for integration with other modules
+let client: Client;
 
-export class WhatsAppClient {
-  private chats: Chat[] = [];
-  private defaultChat = "";
-  private groupToSendErrors = "";
 
-  public constructor(private clientId: string) {
-    this.client = new Client(getClientOptions(this.clientId));
-  }
+// Start WhatsApp client
+function startWhatsApp() {
+  client = new Client(getClientOptions('oito'));
 
-  public async initializeClient(): Promise<void> {
-    void this.subscribeEvents();
-    void (await this.client.initialize());
+  client.on("qr", (qr) => qrcode.generate(qr, { small: true }));
 
-    void (await this.constructDefaults());
-  }
+  client.on("ready", () => {
+    console.log("Connected to WhatsApp!");
+  });
 
-  private subscribeEvents(): void {
-    void this.client
-      .on("qr", WhatsAppClient.generateQrCode)
-      .on("ready", (): void => {
-        console.log(`🤖 Bot WhatsApp Online! ✅\nCliente: ${this.clientId}`);
-      })
-      .on("message", this.onMessage);
-  }
+  client.on("message", async (msg) => {
+    const rawNumber = msg.from;
+    const messageText = msg.body;
+    const numberE164 = `+${rawNumber.replace("@c.us", "")}`;
+    console.log(`Received message from ${numberE164}: ${messageText}`);
+  });
 
-  private async constructDefaults(): Promise<void> {
-    this.chats = await this.client.getChats();
-    this.defaultChat = this.getChatIdByName();
-    this.groupToSendErrors = this.getChatIdByName(env.GROUP_TO_SEND_ERROR);
-
-    void this.sendMessage("🤖 Bot WhatsApp Online! ✅");
-  }
-
-  private static generateQrCode(input: string): void {
-    void QRCode.generate(input, { small: true });
-  }
-
-  private async onMessage({ body, reply }: Message): Promise<void> {
-    if (body === "ping") {
-      void (await reply("pong"));
-      return;
-    }
-
-    void (await readMessage({ body, reply }, this.chats));
-  }
-
-  public async sendMessage(
-    content: string,
-    chatId: string = this.defaultChat,
-  ): Promise<Message> {
-    const [marker]: string = content;
-    if (errorMarkers.includes(marker)) {
-      void (await this.sendMessage(content, this.groupToSendErrors));
-    }
-
-    return await this.client.sendMessage(chatId, content);
-  }
-
-  public getChatIdByName(chatName: string = env.DEFAULT_RECEIVER): string {
-    return getChatIdByName(this.chats, chatName) ?? env.TECH_LEAD;
-  }
-
-  private client: Client;
+  client.initialize();
 }
+const getClient = (): Client => {
+  if (!client) {
+    throw new Error("WhatsApp client is not initialized");
+  }
+  return client;
+};
+export {
+  getClient,
+  startWhatsApp
+};
