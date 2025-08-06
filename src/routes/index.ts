@@ -1,13 +1,12 @@
 import { FastifyInstance } from "fastify";
 
 
-import { Client } from "whatsapp-web.js";
+import { getClient } from "@src/services";
 import { URL_PREFIX } from "../constants";
 import { constructToken } from "../domains/";
 
 export async function constructRoutes(
-  app: FastifyInstance,
-  client: Client,
+  app: FastifyInstance
 ): Promise<void> {
 
   const parentLogger = app.log;
@@ -17,6 +16,7 @@ export async function constructRoutes(
 
     const body = (req.body as unknown as { message: string, phonenumber: string });
     // logger.info({ token });
+    const client = getClient();
 
     // const { message, chatId } = decodeCredentials);
     const { phonenumber, message } = body
@@ -27,15 +27,15 @@ export async function constructRoutes(
 
       reply.send({
         status: "success",
-        message: "Message sent successfully"
+        message: `Mensagem: ${message}, enviada para ${chat._serialized}`
       });
       return
     }
 
     reply.send({
-      status: "error",
+      status: "fail",
       message: "Failed to send message",
-      err: chat
+      err: `Número [${phonenumber}] inválido`,
     });
 
   });

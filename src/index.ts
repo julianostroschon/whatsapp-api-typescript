@@ -1,7 +1,10 @@
 import 'module-alias/register';
-import { buildFastify } from "./services/server";
+import { startWhatsApp } from './services';
+import { buildFastify } from './services/server';
 
 (async () => {
+
+  await startWhatsApp();
 
   await buildFastify();
 })().catch((err) => {
