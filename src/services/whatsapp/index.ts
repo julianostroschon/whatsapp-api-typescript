@@ -4,8 +4,6 @@ import { getClientOptions } from "./lib";
 
 // Exported client for integration with other modules
 let client: Client | null = null;
-let isInitializing = false;
-let initializePromise: Promise<Client> | null = null;
 
 async function startWhatsApp(): Promise<Client> {
   if (client?.info) {
@@ -19,12 +17,8 @@ async function startWhatsApp(): Promise<Client> {
     }
   }
 
-  if (isInitializing && initializePromise) {
-    return initializePromise;
-  }
 
-  isInitializing = true;
-  initializePromise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       client = new Client(getClientOptions('oito'));
 
@@ -35,23 +29,18 @@ async function startWhatsApp(): Promise<Client> {
 
       client.on("ready", () => {
         console.log("Connected to WhatsApp!");
-        isInitializing = false;
         resolve(client!);
       });
 
       client.on("auth_failure", (error) => {
         console.error("WhatsApp authentication failed:", error);
         client = null;
-        isInitializing = false;
-        initializePromise = null;
         reject(error);
       });
 
       client.on("disconnected", async (reason) => {
         console.log("WhatsApp client disconnected:", reason);
         client = null;
-        isInitializing = false;
-        initializePromise = null;
 
         try {
           await startWhatsApp();
@@ -71,14 +60,9 @@ async function startWhatsApp(): Promise<Client> {
 
       client.initialize();
     } catch (error) {
-      client = null;
-      isInitializing = false;
-      initializePromise = null;
       reject(error);
     }
   });
-
-  return initializePromise;
 }
 
 function getClient() {
@@ -90,7 +74,6 @@ function getClient() {
 
 async function sendMessage(number: string, message: string) {
   try {
-    // Try to get or initialize the WhatsApp client
     const whatsappClient = await startWhatsApp();
 
     if (!whatsappClient) {
@@ -101,10 +84,7 @@ async function sendMessage(number: string, message: string) {
       };
     }
 
-    // Check client state
     const state = await whatsappClient.getState();
-    console.log('WhatsApp client state:', { state });
-
     if (!state || state !== 'CONNECTED') {
       return {
         status: "fail",
@@ -113,16 +93,8 @@ async function sendMessage(number: string, message: string) {
       };
     }
 
-    // Format the phone number if needed (remove any non-numeric characters except +)
     const cleanNumber = number.replace(/[^\d+]/g, '');
 
-    if (!whatsappClient) {
-      return {
-        status: "fail",
-        message: "WhatsApp client is not initialized",
-        err: "Please try again later"
-      };
-    }
     const chat = await whatsappClient?.getNumberId(cleanNumber);
     try {
       console.log('Number validation result:', { chat });
