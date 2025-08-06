@@ -9,7 +9,7 @@ const opts = {
   host: env.HOST,
 };
 
-export async function buildFastify(clientId: string): Promise<FastifyInstance> {
+export async function buildFastify(): Promise<FastifyInstance> {
   const app = fastify({
     logger: true,
   });
