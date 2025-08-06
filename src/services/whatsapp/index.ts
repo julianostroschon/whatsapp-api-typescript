@@ -1,11 +1,12 @@
 import qrcode from "qrcode-terminal";
 import { Client } from "whatsapp-web.js";
+import { Logger } from "winston";
 import { getClientOptions } from "./lib";
 
 // Exported client for integration with other modules
 let client: Client | null = null;
 
-async function startWhatsApp(): Promise<Client> {
+async function startWhatsApp(logger: Logger): Promise<Client> {
   if (client?.info) {
     try {
       const state = await client.getState();
@@ -13,7 +14,7 @@ async function startWhatsApp(): Promise<Client> {
         return client;
       }
     } catch (error) {
-      console.log('Error checking client state:', error);
+      logger.error('Error checking client state:', error);
     }
   }
 
@@ -23,17 +24,17 @@ async function startWhatsApp(): Promise<Client> {
       client = new Client(getClientOptions('oito'));
 
       client.on("qr", (qr) => {
-        console.log("Scan this QR code in WhatsApp:");
+        logger.info("Scan this QR code in WhatsApp:");
         qrcode.generate(qr, { small: true });
       });
 
       client.on("ready", () => {
-        console.log("Connected to WhatsApp!");
+        logger.info("Connected to WhatsApp!");
         resolve(client!);
       });
 
       client.on("auth_failure", (error) => {
-        console.error("WhatsApp authentication failed:", error);
+        logger.error("WhatsApp authentication failed:", error);
         client = null;
         reject(error);
       });
@@ -43,9 +44,9 @@ async function startWhatsApp(): Promise<Client> {
         client = null;
 
         try {
-          await startWhatsApp();
+          await startWhatsApp(logger);
         } catch (error) {
-          console.error("Failed to reinitialize after disconnection:", error);
+          logger.error("Failed to reinitialize after disconnection:", error);
         }
       });
 
@@ -60,6 +61,7 @@ async function startWhatsApp(): Promise<Client> {
 
       client.initialize();
     } catch (error) {
+      logger.error("Error initializing WhatsApp client:", error);
       reject(error);
     }
   });
@@ -72,11 +74,12 @@ function getClient() {
   return client
 }
 
-async function sendMessage(number: string, message: string) {
+async function sendMessage(logger: Logger, number: string, message: string) {
   try {
-    const whatsappClient = await startWhatsApp();
+    const whatsappClient = await startWhatsApp(logger);
 
     if (!whatsappClient) {
+      logger.error("WhatsApp client initialization failed");
       return {
         status: "fail",
         message: "WhatsApp client initialization failed",
@@ -86,6 +89,7 @@ async function sendMessage(number: string, message: string) {
 
     const state = await whatsappClient.getState();
     if (!state || state !== 'CONNECTED') {
+      logger.error("WhatsApp client is not ready");
       return {
         status: "fail",
         message: "WhatsApp client is not ready",
@@ -97,9 +101,10 @@ async function sendMessage(number: string, message: string) {
 
     const chat = await whatsappClient?.getNumberId(cleanNumber);
     try {
-      console.log('Number validation result:', { chat });
+      logger.info('Number validation result:', { chat });
 
       if (!chat || !chat._serialized) {
+        logger.error(`Invalid phone number: [${cleanNumber}]`);
         return {
           status: "fail",
           message: "Invalid phone number",
@@ -109,7 +114,7 @@ async function sendMessage(number: string, message: string) {
 
       // Send the message
       await whatsappClient.sendMessage(chat._serialized, message);
-
+      logger.info(`Message sent successfully to [${chat._serialized}]: ${message}`);
       return {
         status: "success",
         message: `Mensagem enviada com sucesso`,
@@ -119,7 +124,7 @@ async function sendMessage(number: string, message: string) {
         }
       };
     } catch (error) {
-      console.error('Error in message sending process:', error);
+      logger.error('Error in message sending process:', error);
       return {
         status: "fail",
         message: "Failed to process message",
@@ -127,7 +132,7 @@ async function sendMessage(number: string, message: string) {
       };
     }
   } catch (error) {
-    console.error('Error in WhatsApp client operation:', error);
+    logger.error('Error in WhatsApp client operation:', error);
     return {
       status: "fail",
       message: "WhatsApp client error",

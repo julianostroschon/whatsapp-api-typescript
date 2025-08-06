@@ -1,22 +1,24 @@
 import { FastifyInstance } from "fastify";
 
+import { Logger } from "winston";
 import { URL_PREFIX } from "../constants";
 import { sendMessage, startWhatsApp } from "../services";
 
 export async function constructRoutes(
-  app: FastifyInstance
+  app: FastifyInstance,
+  parentLogger: Logger
 ): Promise<void> {
+  const logger = parentLogger.child({ module: 'queue' });
   // Initialize WhatsApp client when routes are constructed
   try {
-    await startWhatsApp();
+    await startWhatsApp(logger);
   } catch (error) {
-    app.log.error('Failed to initialize WhatsApp client:', error);
+    logger.error('Failed to initialize WhatsApp client:', error);
   }
 
-  const parentLogger = app.log;
+  // const logger = parentLogger.child({ module: 'routes' });
 
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
-    const logger = parentLogger.child({ method: "send" });
 
     try {
       const body = (req.body as unknown as { message: string, phonenumber: string });
@@ -32,7 +34,7 @@ export async function constructRoutes(
       }
 
       const { phonenumber, message } = body;
-      const result = await sendMessage(phonenumber, message);
+      const result = await sendMessage(logger, phonenumber, message);
 
       if (result.status === "fail") {
         reply.status(400);

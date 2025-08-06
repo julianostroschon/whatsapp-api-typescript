@@ -1,31 +1,32 @@
 import amqp from 'amqplib';
+import { Logger } from 'winston';
 import { cfg } from '../../infra/config';
 import { sendMessage } from '../whatsapp';
 import { buildConsumerTag } from './tag';
 const RABBITMQ_URL = cfg.RABBITMQ_URL;
 const QUEUE_NAME = 'whatsapp.sendMessage';
 
-export async function startRabbitConsumer() {
+export async function startRabbitConsumer(parentLogger: Logger) {
   const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
 
+  const logger = parentLogger.child({ module: 'queue' });
   await channel.assertQueue(QUEUE_NAME, { durable: true });
-  console.log({ QUEUE_NAME }, 'queue created');
+  logger.info('queue created', { QUEUE_NAME });
 
 
   channel.consume(QUEUE_NAME, async (msg: amqp.Message | null) => {
     if (msg) {
       try {
         const content = JSON.parse(msg.content.toString());
-        const response = await sendMessage(content.phonenumber, content.message); // lógica reaproveitada
-        console.log({ response });
+        const response = await sendMessage(logger, content.phonenumber, content.message); // lógica reaproveitada
         if (response.status === "success") {
           channel.ack(msg);
         } else {
           channel.nack(msg, false, false);
         }
       } catch (err) {
-        console.error('Erro ao processar mensagem RabbitMQ', err);
+        logger.error('Erro ao processar mensagem RabbitMQ', err);
         channel.nack(msg, false, false);
       }
     }
