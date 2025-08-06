@@ -1,66 +1,52 @@
 import { FastifyInstance } from "fastify";
 
-
-import { getClient } from "@src/services";
 import { URL_PREFIX } from "../constants";
-import { constructToken } from "../domains/";
+import { sendMessage, startWhatsApp } from "../services";
 
 export async function constructRoutes(
   app: FastifyInstance
 ): Promise<void> {
+  // Initialize WhatsApp client when routes are constructed
+  try {
+    await startWhatsApp();
+  } catch (error) {
+    app.log.error('Failed to initialize WhatsApp client:', error);
+  }
 
   const parentLogger = app.log;
 
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
     const logger = parentLogger.child({ method: "send" });
 
-    const body = (req.body as unknown as { message: string, phonenumber: string });
-    // logger.info({ token });
-    const client = getClient();
+    try {
+      const body = (req.body as unknown as { message: string, phonenumber: string });
+      logger.info({ body });
 
-    // const { message, chatId } = decodeCredentials);
-    const { phonenumber, message } = body
-    const chat = await client.getNumberId(phonenumber)
-    if (chat?._serialized) {
-      await client.sendMessage(chat._serialized, message);
-      logger.info(`message sent: ${message}`);
+      if (!body.phonenumber || !body.message) {
+        reply.status(400).send({
+          status: "fail",
+          message: "Missing required fields",
+          err: "Both phonenumber and message are required"
+        });
+        return;
+      }
 
-      reply.send({
-        status: "success",
-        message: `Mensagem: ${message}, enviada para ${chat._serialized}`
+      const { phonenumber, message } = body;
+      const result = await sendMessage(phonenumber, message);
+
+      if (result.status === "fail") {
+        reply.status(400);
+      }
+
+      logger.info({ result });
+      reply.send(result);
+    } catch (error) {
+      logger.error(error);
+      reply.status(500).send({
+        status: "fail",
+        message: "Internal server error",
+        err: error instanceof Error ? error.message : "Unknown error"
       });
-      return
     }
-
-    reply.send({
-      status: "fail",
-      message: "Failed to send message",
-      err: `Número [${phonenumber}] inválido`,
-    });
-
   });
-
-  // app.post(`${URL_PREFIX}chatId`, async (req, reply) => {
-  //   const logger = parentLogger.child({ method: "chatId" });
-
-  //   const group = (req.body as unknown as { group: string }).group;
-  //   logger.info({ group });
-
-  //   const chatName = decodeChatId(group);
-  //   logger.info({ chatName });
-  //   const chatId = client.getChatIdByName(chatName);
-  //   logger.info(`chatId: ${chatId}`);
-
-  //   reply.send({ chatId });
-  // });
-
-  app.post(`${URL_PREFIX}encrypt`, async (req, reply) => {
-    const { phonenumber, message } = req.body as unknown as {
-      phonenumber: string;
-      message: string;
-    };
-    const payload = constructToken(message, phonenumber);
-    reply.send(payload);
-  });
-
 }

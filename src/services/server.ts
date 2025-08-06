@@ -1,7 +1,7 @@
 import fastify, { FastifyInstance } from "fastify";
 
-import { constructRoutes } from "@src/routes";
 import { env } from "../infra/config";
+import { constructRoutes } from "../routes";
 
 const opts = {
   port: env.PORT,

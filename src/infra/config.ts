@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import { z } from "zod";
 config();
 
 export const env = Object.freeze({
@@ -9,4 +10,12 @@ export const env = Object.freeze({
   CHAT_API_SECRET: process.env.SECRET || "segredo",
   PORT: Number(process.env.PORT || "3001"),
   HOST: process.env.HOST || "0.0.0.0",
+  RABBITMQ_URL: process.env.RABBITMQ_URL || 'amqp://localhost',
 });
+
+
+const envSchema = z.object({
+  RABBITMQ_URL: z.url().default('amqp://localhost'),
+});
+
+export const cfg = envSchema.parse(process.env);
