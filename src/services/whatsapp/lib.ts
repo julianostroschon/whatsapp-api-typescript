@@ -43,7 +43,7 @@ export function getChatIdByName(
   chatName: string,
   logger: FastifyBaseLogger
 ): string | undefined {
-  if(!chats || !chats.length) {
+  if (!chats || !chats.length) {
     logger.warn('No chats found');
     return;
   }

@@ -15,7 +15,7 @@ export async function constructRoutes(
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
     const logger = parentLogger.child({ method: "send" });
 
-    const body = (req.body as unknown as { token: string });
+    const body = (req.body as unknown as { message: string, phonenumber: string });
     // logger.info({ token });
 
     // const { message, chatId } = decodeCredentials);
@@ -63,15 +63,4 @@ export async function constructRoutes(
     reply.send(payload);
   });
 
-  app.post(`${URL_PREFIX}chatIdOne`, async (req, reply) => {
-    const logger = parentLogger.child({ method: "chatId" });
-
-    const chatName = (req.body as unknown as { chatName: string }).chatName;
-    logger.info({ chatName });
-
-    const result = client.getChatIdByName(chatName);
-    logger.info(`chatName(${chatName}): ${result}`);
-
-    reply.send({ result });
-  });
 }

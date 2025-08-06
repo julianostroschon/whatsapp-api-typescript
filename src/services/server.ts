@@ -13,7 +13,7 @@ export async function buildFastify(clientId: string): Promise<FastifyInstance> {
   const app = fastify({
     logger: true,
   });
-  startWhatsApp();
+  await startWhatsApp();
 
   await constructRoutes(app, getClient());
 
