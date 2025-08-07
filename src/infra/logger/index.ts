@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-const logger = winston.createLogger({
+export const parentLogger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   defaultMeta: { service: 'user-service' },
@@ -15,7 +15,7 @@ const logger = winston.createLogger({
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 //
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
+  parentLogger.add(new winston.transports.Console({
     format: winston.format.simple(),
   }));
 }

@@ -1,12 +1,13 @@
+import { parentLogger } from "@/infra/logger";
 import qrcode from "qrcode-terminal";
 import { Client } from "whatsapp-web.js";
-import { Logger } from "winston";
 import { getClientOptions } from "./lib";
 
 // Exported client for integration with other modules
 let client: Client | null = null;
 
-async function startWhatsApp(logger: Logger): Promise<Client> {
+async function startWhatsApp(): Promise<Client> {
+  const logger = parentLogger.child({ module: 'whatsapp' });
   if (client?.info) {
     try {
       const state = await client.getState();
@@ -40,11 +41,11 @@ async function startWhatsApp(logger: Logger): Promise<Client> {
       });
 
       client.on("disconnected", async (reason) => {
-        console.log("WhatsApp client disconnected:", reason);
+        logger.info("WhatsApp client disconnected:", reason);
         client = null;
 
         try {
-          await startWhatsApp(logger);
+          await startWhatsApp();
         } catch (error) {
           logger.error("Failed to reinitialize after disconnection:", error);
         }
@@ -55,7 +56,7 @@ async function startWhatsApp(logger: Logger): Promise<Client> {
         const messageText = msg.body;
         const numberE164 = `+${rawNumber.replace("@c.us", "")}`;
         if (!numberE164.includes("status")) {
-          console.log(`Received message from ${numberE164}: ${messageText}`);
+          logger.info(`Received message from ${numberE164}: ${messageText}`);
         }
       });
 
@@ -67,16 +68,14 @@ async function startWhatsApp(logger: Logger): Promise<Client> {
   });
 }
 
-function getClient() {
-  if (!client) {
-    throw new Error("WhatsApp client is not initialized");
-  }
-  return client
-}
-
-async function sendMessage(logger: Logger, number: string, message: string) {
+async function sendMessage(number: string, message: string) {
+  const logger = parentLogger.child({ module: 'whatsapp.sendMessage' });
   try {
-    const whatsappClient = await startWhatsApp(logger);
+    let whatsappClient = client;
+    if (!client) {
+      logger.info("WhatsApp client is not initialized, starting...");
+      whatsappClient = await startWhatsApp();
+    }
 
     if (!whatsappClient) {
       logger.error("WhatsApp client initialization failed");
@@ -91,9 +90,9 @@ async function sendMessage(logger: Logger, number: string, message: string) {
     if (!state || state !== 'CONNECTED') {
       logger.error("WhatsApp client is not ready");
       return {
-        status: "fail",
+        err: "Please ensure the QR code is scanned and the client is connected",
         message: "WhatsApp client is not ready",
-        err: "Please ensure the QR code is scanned and the client is connected"
+        status: "fail",
       };
     }
 
@@ -106,18 +105,17 @@ async function sendMessage(logger: Logger, number: string, message: string) {
       if (!chat || !chat._serialized) {
         logger.error(`Invalid phone number: [${cleanNumber}]`);
         return {
-          status: "fail",
+          err: `O número [${cleanNumber}] é inválido ou não está registrado no WhatsApp`,
           message: "Invalid phone number",
-          err: `O número [${cleanNumber}] é inválido ou não está registrado no WhatsApp`
+          status: "fail",
         };
       }
 
-      // Send the message
       await whatsappClient.sendMessage(chat._serialized, message);
       logger.info(`Message sent successfully to [${chat._serialized}]: ${message}`);
       return {
-        status: "success",
         message: `Mensagem enviada com sucesso`,
+        status: "success",
         data: {
           to: chat._serialized,
           message: message
@@ -126,20 +124,20 @@ async function sendMessage(logger: Logger, number: string, message: string) {
     } catch (error) {
       logger.error('Error in message sending process:', error);
       return {
-        status: "fail",
+        err: error instanceof Error ? error.message : "Unknown error in message processing",
         message: "Failed to process message",
-        err: error instanceof Error ? error.message : "Unknown error in message processing"
+        status: "fail",
       };
     }
   } catch (error) {
     logger.error('Error in WhatsApp client operation:', error);
     return {
-      status: "fail",
+      err: error instanceof Error ? error.message : "Unknown WhatsApp client error",
       message: "WhatsApp client error",
-      err: error instanceof Error ? error.message : "Unknown WhatsApp client error"
+      status: "fail",
     };
   }
 }
 
-export { getClient, sendMessage, startWhatsApp };
+export { sendMessage, startWhatsApp };
 

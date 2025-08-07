@@ -13,7 +13,8 @@ const envSchema = z.object({
   CHAT_API_SECRET: z.string(),
 
   // RabbitMQ
-  RABBITMQ_URL: z.string().url(),
+  RABBITMQ_URL: z.url().default('amqp://user:password@localhost:5672'),
+  WHATSAPP_QUEUE: z.string().default('whatsapp.sendMessage'),
 
   // Mensageria interna
   GROUP_TO_SEND_ERROR: z.string(),

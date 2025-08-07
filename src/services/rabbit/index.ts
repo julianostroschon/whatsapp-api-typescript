@@ -1,12 +1,12 @@
+import { cfg } from '@/infra/config';
+import { parentLogger } from '@/infra/logger';
 import amqp from 'amqplib';
-import { Logger } from 'winston';
-import { cfg } from '../../infra/config';
 import { sendMessage } from '../whatsapp';
 import { buildConsumerTag } from './tag';
 const RABBITMQ_URL = cfg.RABBITMQ_URL;
-const QUEUE_NAME = 'whatsapp.sendMessage';
+const QUEUE_NAME = cfg.WHATSAPP_QUEUE;
 
-export async function startRabbitConsumer(parentLogger: Logger) {
+export async function startRabbitConsumer() {
   const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
 
@@ -19,11 +19,11 @@ export async function startRabbitConsumer(parentLogger: Logger) {
     if (msg) {
       try {
         const content = JSON.parse(msg.content.toString());
-        const response = await sendMessage(logger, content.phonenumber, content.message); // lógica reaproveitada
+        const response = await sendMessage(content.phonenumber, content.message);
         if (response.status === "success") {
           channel.ack(msg);
         } else {
-          channel.nack(msg, false, false);
+          channel.nack(msg, false, false); // TODO: Identificar se haverá uma outra fila de retentativa
         }
       } catch (err) {
         logger.error('Erro ao processar mensagem RabbitMQ', err);

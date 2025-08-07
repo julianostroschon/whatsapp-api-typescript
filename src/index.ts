@@ -1,16 +1,12 @@
 import 'module-alias/register';
-import { createLogger } from 'winston';
-import { startWhatsApp } from './services';
-import { startRabbitConsumer } from './services/rabbitmq';
+import { startRabbitConsumer } from './services/rabbit';
 import { buildFastify } from './services/server';
 
 (async () => {
-  const logger = createLogger()
 
-  await startWhatsApp(logger);
 
-  await buildFastify(logger);
-  await startRabbitConsumer(logger);
+  await buildFastify();
+  await startRabbitConsumer();
 
 })().catch((err) => {
   console.error(err);
