@@ -1,12 +1,12 @@
 import fastify, { FastifyInstance } from "fastify";
 
 import { Logger } from "winston";
-import { env } from "../infra/config";
+import { cfg } from "../infra/config";
 import { constructRoutes } from "../routes";
 
 const opts = {
-  port: env.PORT,
-  host: env.HOST,
+  port: cfg.PORT,
+  host: cfg.HOST,
 };
 
 export async function buildFastify(logger: Logger): Promise<FastifyInstance> {
@@ -15,6 +15,7 @@ export async function buildFastify(logger: Logger): Promise<FastifyInstance> {
   });
 
   await constructRoutes(app, logger);
+
 
   app.listen(opts, function (err: Error | null): void {
     app.log.info(`Server listening on ${opts.host}:${opts.port}`);

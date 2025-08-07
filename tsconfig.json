@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./types", "./node_modules/@types"],
     "target": "es2019",
     "moduleResolution": "node",
     "module": "commonjs",
@@ -18,9 +19,9 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@src/*": ["./src/*"],
+      "@/*": ["./*"],
       "@test/*": ["./test/*"]
     },
     "rootDirs": ["./src", "./test"],

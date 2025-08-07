@@ -11,7 +11,7 @@ export async function constructRoutes(
   const logger = parentLogger.child({ module: 'queue' });
   // Initialize WhatsApp client when routes are constructed
   try {
-    await startWhatsApp(logger);
+    // await startWhatsApp(logger);
   } catch (error) {
     logger.error('Failed to initialize WhatsApp client:', error);
   }
@@ -19,8 +19,8 @@ export async function constructRoutes(
   // const logger = parentLogger.child({ module: 'routes' });
 
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
-
     try {
+      await startWhatsApp(logger);
       const body = (req.body as unknown as { message: string, phonenumber: string });
       logger.info({ body });
 

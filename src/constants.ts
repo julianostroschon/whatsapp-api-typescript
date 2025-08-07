@@ -1,7 +1,8 @@
-// import { version, name } from '../package.json';
-const [API_VERSION] = "1.0.0";
+import { packageInfo } from "./infra/utils";
+const [API_VERSION] = packageInfo.version.split(".");
 
 const URL_PREFIX = `/api/v${API_VERSION}/`;
-const PROJECT_NAME = "whatsapp-api-typescript";
+const PROJECT_NAME = packageInfo.name;
 
-export { URL_PREFIX, PROJECT_NAME };
+export { API_VERSION, PROJECT_NAME, URL_PREFIX };
+

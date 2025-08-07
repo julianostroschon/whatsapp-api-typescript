@@ -1,21 +1,40 @@
-import { config } from "dotenv";
-import { z } from "zod";
+import { config } from 'dotenv';
+import { z } from 'zod';
+
 config();
 
-export const env = Object.freeze({
-  BLOCKED_ROUTES: (process.env.BLOCKED_ROUTES || 'login,signup').split(','),
-  GROUP_TO_SEND_ERROR: process.env.GROUP_TO_SEND_ERROR || "jojo",
-  DEFAULT_RECEIVER: process.env.DEFAULT_RECEIVER || "groupName",
-  TECH_LEAD: process.env.TECH_LEAD || "5599992200@c.us",
-  CHAT_API_SECRET: process.env.SECRET || "segredo",
-  PORT: Number(process.env.PORT || "3001"),
-  HOST: process.env.HOST || "0.0.0.0",
-  RABBITMQ_URL: process.env.RABBITMQ_URL || 'amqp://localhost',
-});
-
-
 const envSchema = z.object({
-  RABBITMQ_URL: z.url().default('amqp://localhost'),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.coerce.number().default(3001),
+  HOST: z.string().default('0.0.0.0'),
+
+  // Autenticação
+  JWT_SECRET: z.string().min(10, 'JWT_SECRET deve ter pelo menos 10 caracteres'),
+  CHAT_API_SECRET: z.string(),
+
+  // RabbitMQ
+  RABBITMQ_URL: z.string().url(),
+
+  // Mensageria interna
+  GROUP_TO_SEND_ERROR: z.string(),
+  DEFAULT_RECEIVER: z.string(),
+  TECH_LEAD: z.string(),
+
+  // Rotas
+  BLOCKED_ROUTES: z.string().default('login,signup'),
 });
 
-export const cfg = envSchema.parse(process.env);
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('❌ Erro ao validar variáveis de ambiente:');
+  console.error(parsed.error.format());
+  process.exit(1);
+}
+
+const rawEnv = parsed.data;
+
+export const cfg = {
+  ...rawEnv,
+  BLOCKED_ROUTES: rawEnv.BLOCKED_ROUTES.split(',').map(route => route.trim()),
+};
