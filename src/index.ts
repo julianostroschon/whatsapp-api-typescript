@@ -1,6 +1,9 @@
 import 'module-alias/register';
+import { parentLogger } from './infra/logger';
 import { startRabbitConsumer } from './services/rabbit';
 import { buildFastify } from './services/server';
+
+const logger = parentLogger.child({ service: 'app' });
 
 (async () => {
 
@@ -9,8 +12,8 @@ import { buildFastify } from './services/server';
   await startRabbitConsumer();
 
 })().catch((err) => {
-  console.error(err);
+  logger.error(err);
   process.exit(1);
 }).finally(() => {
-  console.log('Application started successfully');
+  logger.info('🚀 App ready to respond');
 });
