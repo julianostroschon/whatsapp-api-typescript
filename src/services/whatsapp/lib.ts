@@ -12,6 +12,7 @@ export function getClientOptions(clientId: string): ClientOptions {
     puppeteer: {
       headless: true,
       args: [
+        "--no-zygote",
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
