@@ -1,4 +1,4 @@
-import { env } from "../infra/config";
+import { cfg } from "@/infra/config";
 import { sign as signToken } from "jsonwebtoken";
 
 export function constructToken(
@@ -10,5 +10,5 @@ export function constructToken(
 }
 
 export function sign(payload: string | object | Buffer): string {
-  return signToken(payload, env.CHAT_API_SECRET);
+  return signToken(payload, cfg.CHAT_API_SECRET);
 }
