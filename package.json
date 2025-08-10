@@ -12,6 +12,8 @@
     "dev": "tsx --tsconfig tsconfig.json --watch src/index.ts",
     "test": "jest --projects ./test --runInBand --passWithNoTests",
     "lint": "eslint ./src .ts",
+    "producer": "tsx --tsconfig tsconfig.json --watch src/producer",
+    "consumer": "tsx --tsconfig tsconfig.json --watch src/consumer",
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
@@ -24,7 +26,6 @@
     "@typescript-eslint/parser": "^5.58.0",
     "eslint": "8.57.0",
     "prettier": "^3.3.1",
-    "puppeteer": "^24.16.0",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.3",
     "typescript": "^5.0.4",
@@ -40,8 +41,9 @@
     "fastify": "5.4.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
+    "puppeteer": "^24.16.0",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "1.31.1-alpha.0",
+    "whatsapp-web.js": "1.32.0",
     "winston": "^3.17.0",
     "zod": "^4.0.15"
   }

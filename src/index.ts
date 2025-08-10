@@ -1,7 +1,7 @@
 import 'module-alias/register';
+import { startRabbitConsumer } from './consumer/rabbit';
 import { parentLogger } from './infra/logger';
-import { startRabbitConsumer } from './services/rabbit';
-import { buildFastify } from './services/server';
+import { buildFastify } from './producer/server';
 
 const logger = parentLogger.child({ service: 'app' });
 

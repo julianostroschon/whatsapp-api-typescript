@@ -1,9 +1,12 @@
 import { FastifyBaseLogger } from "fastify";
+import { join } from "node:path";
 import { Chat, ClientOptions, LocalAuth, Message } from "whatsapp-web.js";
 
 export const errorMarkers = ["❌", "⚠️"];
 
 export function getClientOptions(clientId: string): ClientOptions {
+  const executablePath = join(__dirname, '../../../.cache', 'puppeteer')
+  // const executablePath = '/Applications/Chromium.app/Contents/MacOS/Chromium'
   return {
     authStrategy: new LocalAuth({
       clientId,
@@ -11,6 +14,7 @@ export function getClientOptions(clientId: string): ClientOptions {
     }),
     puppeteer: {
       headless: true,
+      executablePath,
       args: [
         "--no-zygote",
         "--no-sandbox",
@@ -25,10 +29,6 @@ export function getClientOptions(clientId: string): ClientOptions {
         "--disk-cache-size=0",
         "--window-size=1920,1080"
       ],
-    },
-    webVersionCache: {
-      type: "remote",
-      remotePath: "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2429.7.html"
     },
     restartOnAuthFail: true,
     qrMaxRetries: 5,

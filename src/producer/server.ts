@@ -1,14 +1,7 @@
-import fastify, { FastifyInstance } from "fastify";
-
-import { URL_PREFIX } from "@/constants";
 import { cfg } from "@/infra/config";
 import { parentLogger } from "@/infra/logger";
-import { constructRoutes } from "@/routes";
-
-const opts = {
-  port: cfg.PORT,
-  host: cfg.HOST,
-};
+import fastify, { FastifyInstance } from "fastify";
+import { constructRoutes } from "./routes";
 
 export async function buildFastify(): Promise<FastifyInstance> {
   const app = fastify();
@@ -16,12 +9,13 @@ export async function buildFastify(): Promise<FastifyInstance> {
 
   await constructRoutes(app, logger);
 
-  app.listen(opts, function (err: Error | null): void {
-    logger.info(`🌐 Server listening on http://${opts.host}:${opts.port}${URL_PREFIX}`);
+  app.listen({ port: cfg.PORT, host: cfg.HOST }, (err) => {
     if (err) {
       logger.error(err);
       process.exit(1);
     }
+    logger.info(`🌐 Server listening on http://${cfg.HOST}:${cfg.PORT}`);
   });
+
   return app;
 }

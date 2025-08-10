@@ -2,20 +2,18 @@ import winston from 'winston';
 
 export const parentLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
-  // defaultMeta: { service: 'user-service' },
+  format: winston.format.combine(winston.format.timestamp({ format: "HH:mm-dd/MM/YY" }), winston.format.json()),
   transports: [
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
     new winston.transports.File({ filename: 'combined.log' }),
   ],
 });
 
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
 if (process.env.NODE_ENV !== 'production') {
   parentLogger.add(new winston.transports.Console({
-    format: winston.format.simple(),
+    format: winston.format.combine(
+      winston.format.colorize({ all: true }),
+      winston.format.simple()
+    )
   }));
 }
