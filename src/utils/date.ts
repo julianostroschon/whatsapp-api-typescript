@@ -5,8 +5,5 @@ export function parseDate(data: number): string {
     year: 'numeric',
     month: twoDigits,
     day: twoDigits,
-    hour: twoDigits,
-    minute: twoDigits,
-    second: twoDigits,
   });
 }

@@ -7,6 +7,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(3001),
   HOST: z.string().default('0.0.0.0'),
+  TELEGRAM_TOKEN: z.string().default('token'),
 
   // Autenticação
   JWT_SECRET: z.string().min(10, 'JWT_SECRET deve ter pelo menos 10 caracteres'),
@@ -14,7 +15,7 @@ const envSchema = z.object({
 
   // RabbitMQ
   RABBITMQ_URL: z.url().default('amqp://user:password@localhost:5672'),
-  WHATSAPP_QUEUE: z.string().default('whatsapp.sendMessage'),
+  MAIN_QUEUE: z.string().default('messages'),
 
   // Mensageria interna
   GROUP_TO_SEND_ERROR: z.string(),
