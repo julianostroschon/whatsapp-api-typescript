@@ -1,4 +1,4 @@
-import { publishMessage } from "@/producer/rabbit";
+import { sendTelegramMessage } from "@/services";
 import { FastifyInstance } from "fastify";
 import { Logger } from "winston";
 import { URL_PREFIX } from "../constants";
@@ -21,7 +21,7 @@ export async function constructRoutes(
       }
 
       const { phonenumber, message } = body;
-      await publishMessage(phonenumber, message);
+      await sendTelegramMessage(phonenumber, message);
       return { status: 'queued' };
     } catch (error) {
       logger.error(error);
