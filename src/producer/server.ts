@@ -9,7 +9,7 @@ export async function buildFastify(): Promise<FastifyInstance> {
 
   await constructRoutes(app, logger);
 
-  app.listen({ port: cfg.PORT, host: cfg.HOST }, (err) => {
+  app.listen({ port: cfg.PORT }, (err) => {
     if (err) {
       logger.error(err);
       process.exit(1);
