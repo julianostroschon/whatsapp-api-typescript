@@ -1,7 +1,7 @@
-import { sendTelegramMessage } from "@/services";
 import { FastifyInstance } from "fastify";
 import { Logger } from "winston";
 import { URL_PREFIX } from "../constants";
+import { sendTelegramMessage } from "../services";
 
 export async function constructRoutes(
   app: FastifyInstance,

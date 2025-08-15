@@ -1,6 +1,6 @@
-import { setupGracefulShutdown } from '@/utils/shutdown';
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
+import { setupGracefulShutdown } from '../utils/shutdown';
 import { buildFastify } from './server';
 
 const logger = parentLogger.child({ service: 'producer-app' });
