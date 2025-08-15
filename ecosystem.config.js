@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'producer',
-      script: './dist/producer', // Caminho para o seu arquivo compilado
+      script: __dirname + './dist/producer', // Caminho para o seu arquivo compilado
       interpreter: 'node',
       // Você pode usar o env_file ou referenciar as variáveis diretamente.
       // Opção 1: Usar um arquivo .env
