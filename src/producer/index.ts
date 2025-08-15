@@ -1,6 +1,6 @@
-import { getBot } from '@/services';
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
+import { getBot } from '../services';
 import { setupGracefulShutdown } from '../utils/shutdown';
 import { initRabbitProducer } from './rabbit';
 import { buildFastify } from './server';
