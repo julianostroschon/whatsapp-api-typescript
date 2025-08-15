@@ -6,7 +6,8 @@
     "module": "commonjs",
     "lib": ["es2019"],
     "sourceMap": true,
-    "outDir": "dist",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -19,9 +20,9 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
       "@test/*": ["./test/*"]
     },
     "rootDirs": ["./src", "./test"],

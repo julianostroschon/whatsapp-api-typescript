@@ -10,6 +10,8 @@ export async function constructRoutes(
 
   app.post(`${URL_PREFIX}send`, async (req, reply) => {
     try {
+      logger.info('📥 Received request', { body: req.body });
+
       const body = (req.body as unknown as { message: string, phonenumber: string });
       if (!body.phonenumber || !body.message) {
         logger.warn('Missing required fields');
@@ -24,7 +26,7 @@ export async function constructRoutes(
       await sendTelegramMessage(phonenumber, message);
       return { status: 'queued' };
     } catch (error) {
-      logger.error(error);
+      logger.error('❌ Error processing request:', error);
       return reply.status(500).send({
         status: "fail",
         message: "Internal server error",

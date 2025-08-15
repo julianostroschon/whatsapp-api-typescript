@@ -1,8 +1,7 @@
-import { cfg } from '@/infra/config';
-import { parentLogger } from '@/infra/logger';
-import { buildConsumerTag } from '@/services/rabbit/tag';
-import { sendTelegramMessage } from '@/services/telegram';
 import amqp from 'amqplib';
+import { cfg } from '../infra/config';
+import { parentLogger } from '../infra/logger';
+import { buildConsumerTag, sendTelegramMessage } from '../services';
 
 const logger = parentLogger.child({ service: 'consumer' });
 
@@ -22,7 +21,7 @@ export async function startRabbitConsumer() {
 
         logger.info(`✅ Message sent`, { content });
         channel.ack(message);
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (err instanceof Error) {
           logger.error(`❌ Error processing message ${err.message}[${content.phonenumber}]`,);
         }
@@ -30,4 +29,6 @@ export async function startRabbitConsumer() {
       }
     }
   }, { consumerTag });
+
+  return channel
 }
