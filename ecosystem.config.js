@@ -1,3 +1,5 @@
+const { config } = require("dotenv")
+config()
 const path = require("node:path")
 
 const port = process.env.PORT || 3005
