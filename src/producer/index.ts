@@ -1,6 +1,5 @@
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
-import { getBot } from '../services';
 import { setupGracefulShutdown } from '../utils/shutdown';
 import { initRabbitProducer } from './rabbit';
 import { buildFastify } from './server';
@@ -8,7 +7,6 @@ import { buildFastify } from './server';
 const logger = parentLogger.child({ service: 'producer-app' });
 
 async function main(): Promise<void> {
-  getBot()
   const channel = await initRabbitProducer();
   const app = await buildFastify();
 

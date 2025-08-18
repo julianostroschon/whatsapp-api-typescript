@@ -21,6 +21,7 @@ const envSchema = z.object({
   // GROUP_TO_SEND_ERROR: z.string(),
   // DEFAULT_RECEIVER: z.string(),
   // TECH_LEAD: z.string(),
+  ROUTINE_NEW_MESAGE: z.string().default('new-message'),
 
   // // Rotas
   BLOCKED_ROUTES: z.string().default('login,signup'),

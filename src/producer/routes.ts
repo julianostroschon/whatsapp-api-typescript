@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { Logger } from "winston";
 import { URL_PREFIX } from "../constants";
-import { sendTelegramMessage } from "../services";
+import { publishMessage } from "./rabbit";
 
 export async function constructRoutes(
   app: FastifyInstance,
@@ -23,7 +23,7 @@ export async function constructRoutes(
       }
 
       const { phonenumber, message } = body;
-      await sendTelegramMessage(phonenumber, message);
+      await publishMessage(phonenumber, message);
       return { status: 'queued' };
     } catch (error) {
       logger.error('❌ Error processing request:', error);
