@@ -1,5 +1,5 @@
 services:
-  rabbitmq:
+  rabbit:
     image: 'rabbitmq:3-management'
     hostname: 'rabbitmq'
     container_name: 'rabbitmq-wpp'
@@ -7,5 +7,5 @@ services:
       RABBITMQ_DEFAULT_USER: 'user'
       RABBITMQ_DEFAULT_PASS: 'password'
     ports:
-      - '5671:5672' # Porta padrão do RabbitMQ
-      - '15671:15672' # Porta da interface de gerenciamento web
+      - '5672:5672' # Porta padrão do RabbitMQ
+      - '15672:15672' # Porta da interface de gerenciamento web

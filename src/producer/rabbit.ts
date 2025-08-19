@@ -1,28 +1,32 @@
-import amqp from 'amqplib';
+import { connect, type AssertExchange, type Channel } from 'amqplib';
 import { cfg } from '../infra/config';
 import { parentLogger } from '../infra/logger';
 
-let channel: amqp.Channel;
+let channel: Channel;
 const logger = parentLogger.child({ service: 'producer' });
 
-export async function initRabbitProducer() {
-  const conn = await amqp.connect(cfg.RABBITMQ_URL);
+const typeToManageMessages = 'direct'
+const options: AssertExchange = { durable: true }
+const exchange = 'telegram'
+
+export async function initRabbitProducer(): Promise<Channel> {
+  const conn = await connect(cfg.RABBITMQ_URL);
   channel = await conn.createChannel();
 
-  await channel.assertExchange('telegram', 'direct', { durable: true });
-  await channel.assertQueue(cfg.MAIN_QUEUE, { durable: true });
+  await channel.assertExchange(exchange, typeToManageMessages, options);
+  await channel.assertQueue(cfg.MAIN_QUEUE, options);
 
   logger.info(`✅ RabbitMQ Producer conectado, exchange=telegram`);
   return channel;
 }
 
-export async function publishMessage(phonenumber: string, message: string) {
+export async function publishMessage(phonenumber: string, message: string): Promise<void> {
   if (!channel) throw new Error('RabbitMQ channel não inicializado');
 
-  const content = JSON.stringify({ phonenumber, message });
+  const content = Buffer.from(JSON.stringify({ phonenumber, message }));
 
   try {
-    const success = channel.publish('telegram', cfg.ROUTINE_NEW_MESAGE, Buffer.from(content), {
+    const success = channel.publish(exchange, cfg.ROUTINE_NEW_MESAGE, content, {
       persistent: true
     });
 

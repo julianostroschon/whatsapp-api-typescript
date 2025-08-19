@@ -1,26 +1,29 @@
-import TelegramBot, { Message, SendMessageOptions } from 'node-telegram-bot-api';
+import TelegramBot, { ConstructorOptions, Message, SendMessageOptions } from 'node-telegram-bot-api';
 import { cfg } from '../../infra/config';
 import { parentLogger } from '../../infra/logger';
 
 const logger = parentLogger.child({ service: 'telegram' });
-const token = cfg.TELEGRAM_TOKEN;
 const options: SendMessageOptions = { parse_mode: 'Markdown' };
 
 let bot: TelegramBot | null = null;
 
+function initBot(): TelegramBot {
+  const botOptions: ConstructorOptions = {
+    polling: {
+      interval: 300,
+      autoStart: true,
+      params: {
+        timeout: 10,
+        offset: -1
+      }
+    }
+  }
+  return new TelegramBot(cfg.TELEGRAM_TOKEN, botOptions);
+}
+
 export function getBot(): TelegramBot {
   if (!bot) {
-    // Configurar o bot para responder apenas às novas mensagens
-    bot = new TelegramBot(token, {
-      polling: {
-        interval: 300,
-        autoStart: true,
-        params: {
-          timeout: 10,
-          offset: -1
-        }
-      }
-    });
+    bot = initBot()
 
     bot.onText(/\/start/, (msg: Message): void => {
       const chatId = msg.chat.id;
@@ -50,16 +53,12 @@ export async function sendTelegramMessage(chatId: string | number, text: string,
       throw new Error(`ChatId inválido: ${chatId}`);
     }
 
-    logger.info(`📤 Enviando mensagem para chatId: ${chatId}`, { text: text.substring(0, 100) });
-
     await botInstance.sendMessage(chatId, text, opts);
 
     logger.info(`✅ Mensagem enviada com sucesso para chatId: ${chatId}`);
     return { status: 'queued' };
-
   } catch (error) {
     logger.error(`❌ Erro ao enviar mensagem para chatId ${chatId}:`, error);
-
     throw error;
   }
 }

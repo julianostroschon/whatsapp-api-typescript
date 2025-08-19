@@ -3,7 +3,7 @@ import { parentLogger } from "../infra/logger";
 const logger = parentLogger.child({ module: 'shutdown' })
 
 export function setupGracefulShutdown(closeFns: Array<() => Promise<void> | void>): void {
-  const shutdown = async (signal: string) => {
+  const shutdown = async (signal: string): Promise<void> => {
     logger.warn(`🚧 Received ${signal}, shutting down gracefully...`);
     for (const fn of closeFns) {
       try {
@@ -16,6 +16,11 @@ export function setupGracefulShutdown(closeFns: Array<() => Promise<void> | void
       process.exit(0);
     }
   }
-  process.on('SIGINT', () => shutdown('SIGINT'));
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  Object.entries({
+    SIGINT: 'SIGINT',
+    SIGTERM: 'SIGTERM'
+  })
+    .map(([event, signal]) => {
+      return process.on(event, (): Promise<void> => shutdown(signal))
+    })
 }

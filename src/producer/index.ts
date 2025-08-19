@@ -1,3 +1,4 @@
+import { cleanupTelegramBot } from '@/services';
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
 import { setupGracefulShutdown } from '../utils/shutdown';
@@ -18,6 +19,9 @@ async function main(): Promise<void> {
     async (): Promise<void> => {
       logger.info('Closing Fastify server...');
       await app.close();
+    },
+    async (): Promise<void> => {
+      cleanupTelegramBot();
     }
   ]);
 }
