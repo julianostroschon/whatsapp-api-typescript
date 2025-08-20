@@ -1,9 +1,9 @@
-import { buildConsumerTag } from "@/services"
+import { buildConsumerTag } from "../services"
 
 export const consumer = {
-  queue: 'oito',
-  exchange: 'nove',
-  tag: function () {
+  queue: 'submit-messages',
+  exchange: 'submit-exchange',
+  tag: function (): string {
     return buildConsumerTag(this.queue)
   }
 }

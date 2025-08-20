@@ -13,7 +13,7 @@ interface MessageContent {
   message: string;
 }
 
-export async function startRabbitProducer() {
+export async function startRabbitProducer(): Promise<Channel> {
   const consumerTag = buildConsumerTag(producer.queue);
   const connection = await connect(cfg.RABBITMQ_URL);
   const channel = await connection.createChannel();
@@ -58,9 +58,10 @@ export async function startRabbitProducer() {
 
   return channel;
 }
-const consumerExchange = 'telegram'
 export async function publishMessage(phonenumber: string, message: string): Promise<void> {
-  if (!producerChannel) throw new Error('RabbitMQ channel não inicializado');
+  if (!producerChannel) {
+    await startRabbitProducer()
+  }
 
   const content = Buffer.from(JSON.stringify({ phonenumber, message }));
 
@@ -70,7 +71,7 @@ export async function publishMessage(phonenumber: string, message: string): Prom
     });
 
     if (success) {
-      logger.info(`📤 Mensagem enviada para exchange ${consumerExchange}`, {
+      logger.info(`📤 Mensagem enviada para exchange "${consumer.exchange}"`, {
         messageLength: message.length,
         phonenumber,
       });

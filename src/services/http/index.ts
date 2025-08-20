@@ -5,16 +5,15 @@ import { constructRoutes } from "./routes";
 
 export async function buildFastify(): Promise<FastifyInstance> {
   const app = fastify();
-  const logger = parentLogger.child({ service: 'API' });
+  const logger = parentLogger.child({ service: 'http' });
 
-  // Adicionar uma rota de teste simples
-  app.get('/', async () => {
+  app.get('/.ping', async (): Promise<{ hello: string }> => {
     return { hello: 'world' };
   });
 
   await constructRoutes(app, logger);
 
-  app.listen({ port: cfg.PORT }, (err) => {
+  app.listen({ port: cfg.PORT }, (err: Error | null): void => {
     if (err) {
       logger.error(err);
       process.exit(1);
