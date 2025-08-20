@@ -1,7 +1,6 @@
-import { cleanupTelegramBot } from '@/services';
-import { buildFastify } from '@/services/http';
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
+import { buildFastify, cleanupTelegramBot } from '../services';
 import { setupGracefulShutdown } from '../utils/shutdown';
 import { startRabbitProducer } from './rabbit';
 

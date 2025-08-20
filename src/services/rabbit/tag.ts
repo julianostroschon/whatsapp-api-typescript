@@ -1,4 +1,4 @@
-import { packageInfo } from "../../infra/constants";
+import { packageInfo } from "../../infra/";
 import { parseDate } from "../../utils/date";
 
 export function buildConsumerTag(queue: string): string {

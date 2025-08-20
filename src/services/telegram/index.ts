@@ -1,6 +1,5 @@
 import TelegramBot, { ConstructorOptions, Message, SendMessageOptions } from 'node-telegram-bot-api';
-import { cfg } from '../../infra/config';
-import { parentLogger } from '../../infra/logger';
+import { cfg, parentLogger } from '../../infra/';
 
 const logger = parentLogger.child({ service: 'telegram' });
 const options: SendMessageOptions = { parse_mode: 'Markdown' };

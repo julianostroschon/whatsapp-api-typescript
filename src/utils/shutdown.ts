@@ -1,4 +1,4 @@
-import { parentLogger } from "../infra/logger";
+import { parentLogger } from "../infra/";
 
 const logger = parentLogger.child({ module: 'shutdown' })
 

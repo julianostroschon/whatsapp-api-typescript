@@ -1,8 +1,6 @@
-import { consumer } from '@/consumer/constants';
-import { buildConsumerTag } from '@/services';
 import { connect, ConsumeMessage, type Channel } from 'amqplib';
-import { cfg } from '../infra/config';
-import { parentLogger } from '../infra/logger';
+import { consumer } from '../consumer/constants';
+import { cfg, parentLogger } from '../infra';
 import { producer } from './constants';
 
 let producerChannel: Channel;
@@ -14,7 +12,7 @@ interface MessageContent {
 }
 
 export async function startRabbitProducer(): Promise<Channel> {
-  const consumerTag = buildConsumerTag(producer.queue);
+  const consumerTag = producer.tag();
   const connection = await connect(cfg.RABBITMQ_URL);
   const channel = await connection.createChannel();
 

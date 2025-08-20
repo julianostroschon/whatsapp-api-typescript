@@ -1,4 +1,4 @@
-import { packageInfo } from "./infra/constants";
+import { packageInfo } from "./infra/";
 const [API_VERSION] = packageInfo.version.split(".");
 
 const URL_PREFIX = `/api/v${API_VERSION}/`;
