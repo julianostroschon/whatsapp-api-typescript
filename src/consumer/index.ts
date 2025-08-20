@@ -3,7 +3,7 @@ import { parentLogger } from '../infra/logger';
 import { setupGracefulShutdown } from '../utils/shutdown';
 import { startRabbitConsumer } from './rabbit';
 
-const logger = parentLogger.child({ service: 'consumer-app' });
+const logger = parentLogger.child({ service: 'consumer' });
 
 async function main(): Promise<void> {
   const channel = await startRabbitConsumer();

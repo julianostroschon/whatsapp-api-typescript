@@ -1,37 +1,76 @@
-import { connect, type AssertExchange, type Channel } from 'amqplib';
+import { consumer } from '@/consumer/constants';
+import { buildConsumerTag } from '@/services';
+import { connect, ConsumeMessage, type Channel } from 'amqplib';
 import { cfg } from '../infra/config';
 import { parentLogger } from '../infra/logger';
+import { producer } from './constants';
 
-let channel: Channel;
+let producerChannel: Channel;
 const logger = parentLogger.child({ service: 'producer' });
 
-const typeToManageMessages = 'direct'
-const options: AssertExchange = { durable: true }
-const exchange = 'telegram'
-
-export async function initRabbitProducer(): Promise<Channel> {
-  const conn = await connect(cfg.RABBITMQ_URL);
-  channel = await conn.createChannel();
-
-  await channel.assertExchange(exchange, typeToManageMessages, options);
-  await channel.assertQueue(cfg.MAIN_QUEUE, options);
-
-  logger.info(`✅ RabbitMQ Producer conectado, exchange=telegram`);
-  return channel;
+interface MessageContent {
+  phonenumber: string;
+  message: string;
 }
 
+export async function startRabbitProducer() {
+  const consumerTag = buildConsumerTag(producer.queue);
+  const connection = await connect(cfg.RABBITMQ_URL);
+  const channel = await connection.createChannel();
+
+  await channel.assertQueue(producer.queue, { durable: true });
+  await channel.assertExchange(producer.exchange, 'direct', { durable: true });
+  await channel.bindQueue(producer.queue, producer.exchange, cfg.ROUTINE_NEW_MESAGE);
+
+  logger.info(`👷 Worker criado, aguardando mensagens`, { queue: producer.queue });
+
+  channel.consume(producer.queue, async (consumeMessage: ConsumeMessage | null): Promise<void> => {
+    if (consumeMessage) {
+      try {
+        const content = JSON.parse(consumeMessage.content.toString()) as MessageContent;
+        const { phonenumber, message } = content
+
+        if (!phonenumber || !message) {
+          logger.error(`❌ Mensagem recebida inválida`, { content });
+          return channel.nack(consumeMessage, false, false);
+        }
+
+        logger.info(`📥 Processando mensagem`, {
+          phonenumber: phonenumber,
+          messageLength: message.length
+        });
+
+        await publishMessage(phonenumber, message);
+
+        channel.ack(consumeMessage);
+
+      } catch (err) {
+        logger.error(`❌ Erro ao processar mensagem`, {
+          error: err instanceof Error ? err.message : 'Erro desconhecido',
+          content: consumeMessage.content.toString()
+        });
+        channel.nack(consumeMessage, false, false);
+      }
+    }
+  }, { consumerTag });
+
+  producerChannel = channel
+
+  return channel;
+}
+const consumerExchange = 'telegram'
 export async function publishMessage(phonenumber: string, message: string): Promise<void> {
-  if (!channel) throw new Error('RabbitMQ channel não inicializado');
+  if (!producerChannel) throw new Error('RabbitMQ channel não inicializado');
 
   const content = Buffer.from(JSON.stringify({ phonenumber, message }));
 
   try {
-    const success = channel.publish(exchange, cfg.ROUTINE_NEW_MESAGE, content, {
+    const success = producerChannel.publish(consumer.exchange, cfg.ROUTINE_NEW_MESAGE, content, {
       persistent: true
     });
 
     if (success) {
-      logger.info(`📤 Mensagem enviada para exchange telegram`, {
+      logger.info(`📤 Mensagem enviada para exchange ${consumerExchange}`, {
         messageLength: message.length,
         phonenumber,
       });

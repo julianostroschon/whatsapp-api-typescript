@@ -1,14 +1,15 @@
 import { cleanupTelegramBot } from '@/services';
+import { buildFastify } from '@/services/http';
 import 'module-alias/register';
 import { parentLogger } from '../infra/logger';
 import { setupGracefulShutdown } from '../utils/shutdown';
-import { initRabbitProducer } from './rabbit';
-import { buildFastify } from './server';
+import { startRabbitProducer } from './rabbit';
 
 const logger = parentLogger.child({ service: 'producer-app' });
 
 async function main(): Promise<void> {
-  const channel = await initRabbitProducer();
+  const channel = await startRabbitProducer();
+
   const app = await buildFastify();
 
   setupGracefulShutdown([

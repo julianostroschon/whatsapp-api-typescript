@@ -2,10 +2,9 @@ import { MessageServices, sendMessage } from '@/services/messages';
 import { connect, type ConsumeMessage } from 'amqplib';
 import { cfg } from '../infra/config';
 import { parentLogger } from '../infra/logger';
-import { buildConsumerTag } from '../services';
+import { consumer } from './constants';
 
-const logger = parentLogger.child({ service: 'consumer' });
-const queue = 'telegram';
+const logger = parentLogger.child({ service: 'consumer-rabbit' });
 
 interface MessageContent {
   phonenumber: string;
@@ -13,21 +12,20 @@ interface MessageContent {
 }
 
 export async function startRabbitConsumer() {
-  const consumerTag = buildConsumerTag(queue);
+  const consumerTag = consumer.tag();
   const connection = await connect(cfg.RABBITMQ_URL);
   const channel = await connection.createChannel();
 
-  await channel.assertQueue(queue, { durable: true });
-  await channel.assertExchange('telegram', 'direct', { durable: true });
-  await channel.bindQueue(queue, 'telegram', cfg.ROUTINE_NEW_MESAGE);
+  await channel.assertQueue(consumer.queue, { durable: true });
+  await channel.assertExchange(consumer.exchange, 'direct', { durable: true });
+  await channel.bindQueue(consumer.queue, consumer.exchange, cfg.ROUTINE_NEW_MESAGE);
 
-  logger.info(`👷 Worker criado, aguardando mensagens do exchange telegram`, { queue: queue });
+  logger.info(`👷 Worker criado, aguardando mensagens do exchange "${consumer.exchange}"`, { queue: consumer.queue });
 
-  channel.consume(queue, async (message: ConsumeMessage | null): Promise<void> => {
+  channel.consume(consumer.queue, async (message: ConsumeMessage | null): Promise<void> => {
     if (message) {
       try {
         const content = JSON.parse(message.content.toString()) as MessageContent;
-
         if (!content.phonenumber || !content.message) {
           logger.error(`❌ Mensagem inválida recebida`, { content });
           return channel.nack(message, false, false);
