@@ -9,7 +9,7 @@
     "build": "tsc --project tsconfig.json",
     "start": "node dist/",
     "format": "prettier -w .",
-    "dev": "tsx --tsconfig tsconfig.json --watch index.ts",
+    "dev": "tsx --tsconfig tsconfig.json --watch src/index.ts",
     "test": "jest --projects ./test --runInBand --passWithNoTests",
     "lint": "eslint ./src .ts",
     "producer": "tsx --tsconfig tsconfig.json --watch src/producer",
